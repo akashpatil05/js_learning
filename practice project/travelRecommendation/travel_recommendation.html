@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelBloom - Travel Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: rgba(33, 33, 33, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        nav button:hover {
+            color: #00bcd4;
+        }
+
+        .search-bar-container {
+            display: flex;
+            background: white;
+            padding: 0.3rem 0.3rem 0.3rem 1rem;
+            border-radius: 25px;
+            align-items: center;
+        }
+
+        .search-bar-container input {
+            border: none;
+            outline: none;
+            padding: 0.5rem;
+            width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .search-bar-container .icon {
+            color: #1a759f;
+            margin-right: 0.5rem;
+        }
+
+        .search-bar-container button {
+            padding: 0.5rem 1.2rem;
+            background-color: #1a759f;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .search-bar-container button:hover {
+            background-color: #166488;
+        }
+
+        /* Social Sidebar */
+        .social-sidebar {
+            position: fixed;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            z-index: 50;
+        }
+
+        .social-sidebar a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .social-sidebar a:hover {
+            color: #00bcd4;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: url('hero-background.jpg') center/cover no-repeat;
+            height: 100vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-left: 8rem;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            border-left: 2px solid white;
+            padding-left: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .hero .btn-book {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            background-color: #1a759f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            text-transform: uppercase;
+        }
+
+        .hero .btn-book:hover {
+            background-color: #166488;
+        }
+
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        /* Search Results Container */
+        #searchResults {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .recommendation-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendation-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recommendation-card .content {
+            padding: 1.5rem;
+        }
+
+        .recommendation-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-card .btn-visit {
+            background-color: #1a759f;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* About and Contact Sections */
+        .about-contact-content {
+            padding: 8rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-section {
+            margin-bottom: 3rem;
+        }
+
+        .about-section h2 {
+            color: #1a759f;
+            margin-bottom: 1rem;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #1a759f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Social Media Sidebar -->
+    <div class="social-sidebar">
+        <a href="#" title="Twitter"><svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+            </svg></a>
+        <a href="#" title="Facebook"><svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                    d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
+            </svg></a>
+        <a href="#" title="Instagram"><svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+            </svg></a>
+        <a href="#" title="YouTube"><svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                    d="M21.582 6.186a2.646 2.646 0 0 0-1.864-1.884C17.652 3.864 12 3.864 12 3.864s-5.652 0-7.718.438a2.645 2.645 0 0 0-1.864 1.884C2 8.28 2 12 2 12s0 3.72.418 5.814a2.646 2.646 0 0 0 1.864 1.884c2.066.438 7.718.438 7.718.438s5.652 0 7.718-.438a2.645 2.645 0 0 0 1.864-1.884c.418-2.094.418-5.814.418-5.814s0-3.72-.418-5.814zm-11.82 9.071v-6.514l6.236 3.257-6.236 3.257z" />
+            </svg></a>
+    </div>
+
+    <header>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" width="30" height="30" style="margin-right: 10px;">
+                <path fill="white"
+                    d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+            </svg>
+            TravelBloom
+        </div>
+        <nav>
+            <ul>
+                <button onclick="showSection('home')">Home</button>
+                <button onclick="showSection('about')">About Us</button>
+                <button onclick="showSection('contact')">Contact Us</button>
+            </ul>
+        </nav>
+        <div class="search-bar-container">
+            <svg class="icon" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor"
+                    d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Enter a destination or keyword">
+            <button onclick="searchDestinations()">Search</button>
+            <button class="clear-btn" onclick="clearResults()">Clear</button>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="active">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>EXPLORE<br>DREAM<br>DESTINATION</h1>
+                <p>It encourages exploration of unfamiliar territories, embracing diverse cultures and landscapes, while
+                    pursuing the desired destination that captivates the heart and ignites a sense of wonder.</p>
+                <button class="btn-book" onclick="document.getElementById('searchInput').focus()">BOOK NOW</button>
+            </div>
+        </div>
+        <div id="searchResults"></div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="about-contact-content">
+            <h1>About TravelBloom</h1>
+
+            <div class="about-section">
+                <h2>Our Mission</h2>
+                <p>At TravelBloom, we believe travel is the best teacher. Our mission is to inspire and help travelers
+                    discover extraordinary destinations that match their interests and preferences. We provide
+                    comprehensive travel recommendations backed by detailed information and local insights.</p>
+            </div>
+
+            <div class="about-section">
+                <h2>Our Team</h2>
+                <div class="team-members">
+                    <div class="team-member">
+                        <h3>Sarah Johnson</h3>
+                        <p><strong>CEO & Founder</strong></p>
+                        <p>With 15 years of travel experience, Sarah leads TravelBloom's vision to revolutionize travel
+                            recommendations.</p>
+                    </div>
+                    <div class="team-member">
+                        <h3>Michael Chen</h3>
+                        <p><strong>Travel Expert</strong></p>
+                        <p>Michael has visited over 100 countries and brings invaluable insights to our recommendation
+                            platform.</p>
+                    </div>
+                    <div class="team-member">
+                        <h3>Emma Rodriguez</h3>
+                        <p><strong>Content Manager</strong></p>
+                        <p>Emma ensures our destination guides are accurate, engaging, and regularly updated with latest
+                            information.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h2>Our History</h2>
+                <p><strong>2020:</strong> TravelBloom was founded with a simple vision - to help people find their
+                    perfect destination.</p>
+                <p><strong>2021:</strong> Launched our first mobile app and expanded our database to 50+ destinations.
+                </p>
+                <p><strong>2022:</strong> Reached 100,000 active users and established partnerships with major travel
+                    agencies.</p>
+                <p><strong>2023:</strong> Introduced AI-powered recommendations and expanded to 150+ destinations
+                    worldwide.</p>
+                <p><strong>2024:</strong> Became the leading travel recommendation platform with 500,000+ users
+                    globally.</p>
+            </div>
+
+            <div class="about-section">
+                <h2>Office Locations</h2>
+                <p><strong>New York, USA</strong> - Our main headquarters</p>
+                <p><strong>London, UK</strong> - European operations center</p>
+                <p><strong>Bangkok, Thailand</strong> - Asia-Pacific regional office</p>
+                <p><strong>Sydney, Australia</strong> - Oceania operations</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="about-contact-content">
+            <h1>Contact Us</h1>
+            <p style="text-align: center; margin-bottom: 2rem;">Have questions or feedback? We'd love to hear from you!
+            </p>
+
+            <div class="contact-form">
+                <div class="success-message" id="successMessage">
+                    Thank you for contacting us! We'll get back to you soon.
+                </div>
+                <form id="contactForm" onsubmit="submitContactForm(event)">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Send Message</button>
+                    </div>
+                </form>
+
+                <div class="contact-social-links">
+                    <p>Follow us on social media:</p>
+                    <a href="#" title="Twitter">𝕏</a>
+                    <a href="#" title="Facebook">f</a>
+                    <a href="#" title="Instagram">📷</a>
+                    <a href="#" title="YouTube">▶</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="travel_recommendation.js"></script>
+</body>
+
+</html>
